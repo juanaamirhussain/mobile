@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: white;
+        }
+        input, textarea {
+            margin-bottom: 10px;
+            width: 100%;
+            padding: 8px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #result {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: white;
+        }
+        img {
+            max-width: 200px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Details App</h1>
+    <form id="productForm">
+        <label for="productImg">Product Image:</label>
+        <input type="file" id="productImg" name="productImg" accept="image/*" capture="environment">
+
+        <label for="productCode">Product Code:</label>
+        <input type="text" id="productCode" name="productCode">
+
+        <label for="productName">Product Name:</label>
+        <input type="text" id="productName" name="productName">
+
+        <label for="productDetails">Product Details:</label>
+        <textarea id="productDetails" name="productDetails"></textarea>
+
+        <label for="productPrice">Product Price:</label>
+        <input type="text" id="productPrice" name="productPrice">
+
+        <label for="shopkeeperAddress">Shopkeeper Address:</label>
+        <input type="text" id="shopkeeperAddress" name="shopkeeperAddress">
+
+        <label for="shopkeeperPhone">Shopkeeper Phone Number:</label>
+        <input type="text" id="shopkeeperPhone" name="shopkeeperPhone">
+
+        <button type="button" onclick="generateResult()">Generate Result</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.9.0/html-to-image.min.js"></script>
+    <script>
+        function generateResult() {
+            const productImg = document.getElementById('productImg').files[0];
+            const productCode = document.getElementById('productCode').value;
+            const productName = document.getElementById('productName').value;
+            const productDetails = document.getElementById('productDetails').value;
+            const productPrice = document.getElementById('productPrice').value;
+            const shopkeeperAddress = document.getElementById('shopkeeperAddress').value;
+            const shopkeeperPhone = document.getElementById('shopkeeperPhone').value;
+
+            const resultDiv = document.getElementById('result');
+
+            if (productImg) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgHTML = `<img src="${e.target.result}" alt="Product Image">`;
+                    setResultHTML(resultDiv, imgHTML, productCode, productName, productDetails, productPrice, shopkeeperAddress, shopkeeperPhone);
+                }
+                reader.readAsDataURL(productImg);
+            } else {
+                setResultHTML(resultDiv, '', productCode, productName, productDetails, productPrice, shopkeeperAddress, shopkeeperPhone);
+            }
+        }
+
+        function setResultHTML(resultDiv, imgHTML, productCode, productName, productDetails, productPrice, shopkeeperAddress, shopkeeperPhone) {
+            resultDiv.innerHTML = `
+                <h2>Product Details</h2>
+                ${imgHTML}
+                <p><strong>Product Code:</strong> ${productCode}</p>
+                <p><strong>Product Name:</strong> ${productName}</p>
+                <p><strong>Product Details:</strong> ${productDetails}</p>
+                <p><strong>Product Price:</strong> ${productPrice}</p>
+                <p><strong>Shopkeeper Address:</strong> ${shopkeeperAddress}</p>
+                <p><strong>Shopkeeper Phone Number:</strong> ${shopkeeperPhone}</p>
+                <button onclick="downloadResult()">Download Result</button>
+            `;
+        }
+
+        function downloadResult() {
+            const resultDiv = document.getElementById('result');
+            htmlToImage.toJpeg(resultDiv, { backgroundColor: 'white' })
+                .then((dataUrl) => {
+                    const link = document.createElement('a');
+                    link.href = dataUrl;
+                    link.download = 'product-details.jpg';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                })
+                .catch((error) => {
+                    console.error('Error generating image:', error);
+                });
+        }
+    </script>
+</body>
+</html>
